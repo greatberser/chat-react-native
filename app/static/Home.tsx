@@ -28,6 +28,8 @@ export default function Home() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [newChatName, setNewChatName] = useState('');
   const [searchText, setSearchText] = useState('');
+  const [updatingChatId, setUpdatingChatId] = useState<string | null>(null);
+  const [updatedChatName, setUpdatedChatName] = useState('');
 
   useEffect(() => {
     fetchChats();
@@ -51,7 +53,6 @@ export default function Home() {
       setNewChatName('');
     } catch (error) {
       console.error('Failed to create chat:', error.message);
-      // Handle error as needed
     }
   };
 
@@ -62,25 +63,27 @@ export default function Home() {
       setChats(updatedChats);
     } catch (error) {
       console.error('Failed to delete chat:', error.message);
-      // Handle error as needed
     }
   };
 
   const handleUpdateChat = async (id: string, newName: string) => {
     try {
-      const updatedChat = await updateChat(id, { name: newName });
+      const updatedChat = await updateChat(id, newName);
       const updatedChats = chats.map((chat) =>
         chat.id === id ? { ...chat, name: updatedChat.name } : chat
       );
       setChats(updatedChats);
+      setUpdatingChatId(null);
     } catch (error) {
       console.error('Failed to update chat:', error.message);
-      // Handle error as needed
     }
   };
 
-  const filteredChats = chats.filter((chat) =>
-    chat.name.toLowerCase().includes(searchText.toLowerCase())
+  const filteredChats = chats.filter(
+    (chat) =>
+      chat.name &&
+      typeof chat.name === 'string' &&
+      chat.name.toLowerCase().includes(searchText.toLowerCase())
   );
 
   return (
@@ -97,13 +100,16 @@ export default function Home() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('Chat', {
-                chatId: item.id,
-                chatName: item.name,
-                chatAvatar: item.avatar || DEFAULT_AVATAR, // Pass the avatar
-              })
-            }
+            onPress={() => {
+              if (!updatingChatId) {
+                navigation.navigate('Chat', {
+                  chatId: item.id,
+                  chatName: item.name,
+                  chatAvatar: item.avatar || DEFAULT_AVATAR,
+                });
+              }
+            }}
+            activeOpacity={1}
           >
             <View style={styles.chatItem}>
               <View style={styles.chatContent}>
@@ -111,18 +117,36 @@ export default function Home() {
                   uri={item.avatar || DEFAULT_AVATAR}
                   style={styles.avatar}
                 />
-                <Text numberOfLines={2} style={styles.chatName}>
-                  {item.name}
-                </Text>
+                {updatingChatId === item.id ? (
+                  <Input
+                    style={styles.input}
+                    value={updatedChatName}
+                    onChangeText={setUpdatedChatName}
+                    placeholder="Enter new name"
+                  />
+                ) : (
+                  <Text numberOfLines={2} style={styles.chatName}>
+                    {item.name}
+                  </Text>
+                )}
               </View>
               <View style={styles.actionsContainer}>
-                <Button
-                  title="Update"
-                  onPress={() =>
-                    handleUpdateChat(item.id, `${item.name} Updated`)
-                  }
-                  style={styles.actionButton}
-                />
+                {updatingChatId === item.id ? (
+                  <Button
+                    title="Save"
+                    onPress={() => handleUpdateChat(item.id, updatedChatName)}
+                    style={styles.actionButton}
+                  />
+                ) : (
+                  <Button
+                    title="Update"
+                    onPress={() => {
+                      setUpdatingChatId(item.id);
+                      setUpdatedChatName(item.name);
+                    }}
+                    style={styles.actionButton}
+                  />
+                )}
                 <Button
                   title="Delete"
                   onPress={() => handleDeleteChat(item.id)}
@@ -209,12 +233,12 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   searchInput: {
-    height: 30,
+    height: 60,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    width: '100%',
+    width: 300,
   },
 });

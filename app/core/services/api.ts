@@ -2,7 +2,7 @@ const BASE_URL = 'https://6687bd470bc7155dc018e51b.mockapi.io/chats';
 
 export const getChats = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/users`);
+    const response = await fetch(`${BASE_URL}/user`);
     if (!response.ok) {
       throw new Error('Failed to fetch chats');
     }
@@ -15,7 +15,7 @@ export const getChats = async () => {
 
 export const createChat = async (name: string) => {
   try {
-    const response = await fetch(`${BASE_URL}/users`, {
+    const response = await fetch(`${BASE_URL}/user`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ export const createChat = async (name: string) => {
 
 export const deleteChat = async (chatId: string) => {
   try {
-    const response = await fetch(`${BASE_URL}/users/${chatId}`, {
+    const response = await fetch(`${BASE_URL}/user/${chatId}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -49,16 +49,18 @@ export const deleteChat = async (chatId: string) => {
 
 export const updateChat = async (chatId: string, newName: string) => {
   try {
-    const response = await fetch(`${BASE_URL}/users/${chatId}`, {
+    const response = await fetch(`${BASE_URL}/user/${chatId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ name: newName }),
     });
+
     if (!response.ok) {
       throw new Error('Failed to update chat');
     }
+
     return await response.json();
   } catch (error) {
     console.error('API Error:', error.message);

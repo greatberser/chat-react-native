@@ -1,5 +1,3 @@
-// redux/chatsSlice.ts
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getChats, createChat, deleteChat } from '../services/api';
 

@@ -21,11 +21,11 @@ interface Props {
 
 const Chat: React.FC<Props> = ({ route }) => {
   const { chatId, chatName, chatAvatar } = route.params;
-  const DEFAULT_AVATAR = 'https://via.placeholder.com/50'; // Define your default avatar URL
+  const DEFAULT_AVATAR = 'https://via.placeholder.com/50';
 
   const [messages, setMessages] = useState<Message[]>([
     { id: '1', text: 'Hello!', sender: chatName, avatar: chatAvatar },
-    { id: '2', text: 'Hi there!', sender: 'user1', avatar: DEFAULT_AVATAR },
+    { id: '2', text: 'Hi there!', sender: 'You:', avatar: DEFAULT_AVATAR },
   ]);
 
   const [newMessage, setNewMessage] = useState('');

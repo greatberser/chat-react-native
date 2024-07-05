@@ -1,5 +1,3 @@
-// redux/store.ts
-
 import { configureStore } from '@reduxjs/toolkit';
 import chatsReducer from './chatSlices';
 
